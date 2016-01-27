@@ -26,6 +26,8 @@ TARGET_SPECIFIC_HEADER_PATH := $(VENDOR_PATH)/include
 TARGET_BOARD_PLATFORM := msm8226
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno305
 
+USE_CLANG_PLATFORM_BUILD := true
+
 # Architecture
 TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
@@ -39,18 +41,21 @@ TARGET_BOOTLOADER_BOARD_NAME := MSM8226
 TARGET_NO_BOOTLOADER := true
 
 # Kernel
-BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x37 vmalloc=400M utags.blkdev=/dev/block/platform/msm_sdcc.1/by-name/utags
+BOARD_KERNEL_CMDLINE := androidboot.bootdevice=msm_sdcc.1 androidboot.hardware=qcom vmalloc=400M utags.blkdev=/dev/block/platform/msm_sdcc.1/by-name/utags
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
+BOARD_DTBTOOL_ARGS := --force-v2
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01000000 --tags_offset 0x00000100
 TARGET_KERNEL_SOURCE := kernel/motorola/msm8226
+TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-linux-androideabi-
+
+# ANT+
+BOARD_ANT_WIRELESS_DEVICE := "qualcomm-smd"
 
 # Audio
-AUDIO_FEATURE_ENABLED_FM := true
 AUDIO_FEATURE_ENABLED_MULTI_VOICE_SESSIONS := true
 AUDIO_FEATURE_ENABLED_NEW_SAMPLE_RATE := true
-AUDIO_FEATURE_LOW_LATENCY_PRIMARY := true
 BOARD_USES_ALSA_AUDIO := true
 
 # Bluetooth
@@ -61,6 +66,7 @@ BLUETOOTH_HCI_USE_MCT := true
 
 # Camera
 USE_DEVICE_SPECIFIC_CAMERA := true
+TARGET_USE_COMPAT_GRALLOC_ALIGN := true
 
 # Charger
 BOARD_CHARGING_MODE_BOOTING_LPM := /sys/mmi_lpm/lpm_mode
@@ -74,7 +80,7 @@ TARGET_USES_C2D_COMPOSITION := true
 TARGET_USES_ION := true
 USE_OPENGL_RENDERER := true
 
-# FM
+# FM Radio
 TARGET_QCOM_NO_FM_FIRMWARE := true
 
 # Fonts
@@ -86,12 +92,6 @@ TARGET_PROVIDES_LIBLIGHT := true
 # Memory
 MALLOC_IMPL := dlmalloc
 
-# Motorola
-TARGET_USES_MOTOROLA_LOG := true
-
-# Power
-TARGET_POWERHAL_VARIANT := qcom
-
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072
 
@@ -101,8 +101,12 @@ TARGET_SYSTEM_PROP += $(VENDOR_PATH)/system.prop
 # Qualcomm support
 BOARD_USES_QCOM_HARDWARE := true
 
+# Radio
+TARGET_RIL_VARIANT := caf
+
 # Recovery
 COMMON_GLOBAL_CFLAGS += -DNO_SECURE_DISCARD
+TARGET_RECOVERY_FSTAB := $(VENDOR_PATH)/rootdir/etc/fstab.qcom
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
@@ -113,40 +117,7 @@ TARGET_RELEASETOOLS_EXTENSIONS := $(VENDOR_PATH)
 # SELinux
 -include device/qcom/sepolicy/sepolicy.mk
 
-BOARD_SEPOLICY_DIRS += \
-    $(VENDOR_PATH)/sepolicy
-
-BOARD_SEPOLICY_UNION += \
-    akmd8963.te \
-    atvc.te \
-    batt_health.te \
-    device.te \
-    file_contexts \
-    file.te \
-    init.te \
-    init_shell.te \
-    kernel.te \
-    keystore.te \
-    mediaserver.te \
-    mm-qcamerad.te \
-    mpdecision.te \
-    platform_app.te \
-    property_contexts \
-    property.te \
-    rild.te \
-    rmt_storage.te \
-    sensord.te \
-    system_app.te \
-    system_server.te \
-    thermal-engine.te \
-    ueventd.te \
-    vold.te
-
-# Vold
-BOARD_VOLD_DISC_HAS_MULTIPLE_MAJORS := true
-BOARD_VOLD_EMMC_SHARES_DEV_MAJOR := true
-BOARD_VOLD_MAX_PARTITIONS := 40
-TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
+BOARD_SEPOLICY_DIRS += $(VENDOR_PATH)/sepolicy
 
 # Wifi
 BOARD_HAS_QCOM_WLAN := true

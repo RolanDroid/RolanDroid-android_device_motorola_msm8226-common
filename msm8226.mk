@@ -23,6 +23,7 @@ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
 # Permissions
 PRODUCT_COPY_FILES += \
+    external/ant-wireless/antradio-library/com.dsi.ant.antradio_library.xml:system/etc/permissions/com.dsi.ant.antradio_library.xml \
     frameworks/native/data/etc/android.hardware.audio.low_latency.xml:system/etc/permissions/android.hardware.audio.low_latency.xml \
     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml \
     frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml \
@@ -40,11 +41,9 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
     frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
+    frameworks/native/data/etc/android.software.midi.xml:system/etc/permissions/android.software.midi.xml \
     frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml \
     frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml
-
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp
 
 # Screen density
 PRODUCT_AAPT_CONFIG := normal
@@ -55,6 +54,12 @@ TARGET_SCREEN_HEIGHT := 1280
 TARGET_SCREEN_WIDTH := 720
 
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
+
+# ANT+
+PRODUCT_PACKAGES += \
+    AntHalService \
+    com.dsi.ant.antradio_library \
+    libantradio
 
 # Audio
 PRODUCT_PACKAGES += \
@@ -79,7 +84,9 @@ PRODUCT_COPY_FILES += \
 
 # Camera
 PRODUCT_PACKAGES += \
-    libxml2
+    libxml2 \
+    camera.msm8226 \
+    Snap
 
 # Display
 PRODUCT_PACKAGES += \
@@ -94,16 +101,10 @@ PRODUCT_PACKAGES += \
     ethertypes \
     libebtc
 
-# Filesystem
-PRODUCT_PACKAGES += \
-    setup_fs
-
 # FM
 PRODUCT_PACKAGES += \
-    FM2 \
-    FMRecord \
-    libqcomfm_jni \
-    qcom.fmradio
+    FMRadio \
+    libfmjni
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -127,29 +128,30 @@ PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:system/etc/media_codecs_google_telephony.xml \
     frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml \
     $(LOCAL_PATH)/configs/media_codecs.xml:system/etc/media_codecs.xml \
+    $(LOCAL_PATH)/configs/media_codecs_performance.xml:system/etc/media_codecs_performance.xml \
     $(LOCAL_PATH)/configs/media_profiles.xml:system/etc/media_profiles.xml
 
 # OMX
 PRODUCT_PACKAGES += \
-    libdashplayer \
     libOmxCore \
     libOmxVdec \
     libOmxVenc \
-    libstagefrighthw \
-    qcmediaplayer
-
-PRODUCT_BOOT_JARS += \
-    qcmediaplayer
+    libstagefrighthw
 
 # Power
 PRODUCT_PACKAGES += \
     power.msm8226
 
+# Radio
+PRODUCT_PACKAGES += \
+    libcnefeatureconfig
+
 # Ramdisk
 PRODUCT_PACKAGES += \
+    fstab.qcom \
     init.qcom.bt.sh \
     init.qcom.ril.sh \
-    mount_pds.sh
+    dump_pds.sh
 
 PRODUCT_PACKAGES += \
     init.mmi.boot.sh \
@@ -159,6 +161,10 @@ PRODUCT_PACKAGES += \
     init.qcom.usb.rc \
     init.recovery.qcom.rc \
     ueventd.qcom.rc
+
+# Sensors
+PRODUCT_PACKAGES += \
+    sensors.msm8226
 
 # Thermal
 PRODUCT_COPY_FILES += \
